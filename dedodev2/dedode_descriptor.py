@@ -3,7 +3,8 @@ import cv2
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from dedodev2.utils import get_best_device
+from dedodev2.utils import get_best_device, to_normalized_coords
+
 
 class DeDoDeDescriptor(nn.Module):
     def __init__(self,
@@ -36,14 +37,16 @@ class DeDoDeDescriptor(nn.Module):
                 size = sizes[-(idx+2)]
                 descriptor = F.interpolate(descriptor, size = size, mode = "bilinear", align_corners = False)
                 context = F.interpolate(context, size = size, mode = "bilinear", align_corners = False)
-        return {"description_grid" : descriptor}
+        return descriptor
     
     @torch.inference_mode()
     def describe_keypoints(self, img, keypoints):
+        print(keypoints.shape)
         input_tensor = self.preprocess(img)
-        description_grid = self.forward(input_tensor)["description_grid"]
-        described_keypoints = F.grid_sample(description_grid.float(), keypoints[:,None], mode = "bilinear", align_corners = False)[:,:,0].mT
-        return {"descriptions": described_keypoints}
+        description_grid = self.forward(input_tensor)
+        kpts = to_normalized_coords(keypoints[None], img.shape[0], img.shape[1])
+        described_keypoints = F.grid_sample(description_grid.float(), kpts[:,None], mode = "bilinear", align_corners = False)[:,:,0].mT
+        return described_keypoints
     
     def preprocess(self, img):
 

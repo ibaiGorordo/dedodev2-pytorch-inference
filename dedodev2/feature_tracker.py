@@ -27,48 +27,40 @@ class FeatureTracker:
 
     def update(self, frame):
         # Detect keypoints
-        detections = self.detector.detect(frame, num_keypoints=1024)
-        keypoints = detections["keypoints"]
+        keypoints, _ = self.detector.detect(frame, num_keypoints=1024)
 
         # Describe keypoints
-        descriptions = self.descriptor.describe_keypoints(frame, keypoints)["descriptions"]
+        descriptions = self.descriptor.describe_keypoints(frame, keypoints)
 
         # If no keypoints detected, increment missing and return
         if len(keypoints) == 0:
             self.increment_all_missing()
             return False, []
 
+        print(keypoints.shape, descriptions.shape)
+
         # If no keypoints are being tracked, register all detected keypoints
         if len(self.tracked_kps) == 0:
-            keypoints = to_pixel_coords(keypoints, frame.shape[0], frame.shape[1])
-            for kp, desc in zip(keypoints[0], descriptions[0]):
+            for kp, desc in zip(keypoints, descriptions[0]):
                 self.register(kp, desc)
             return False, []
 
         # Match new keypoints with tracked keypoints
         tracked_descs_array = torch.stack(list(self.tracked_descs.values()))
-
-        indices_1, indices_2, _ = self.matcher.match(
-            torch.stack(list(self.tracked_kps.values()))[None],
-            tracked_descs_array[None],
-            keypoints,
-            descriptions,
-            normalize=True,
-            inv_temp=20,
-            threshold=self.comp_thres,
-        )
-
-        keypoints = to_pixel_coords(keypoints, frame.shape[0], frame.shape[1])
+        indices_1, indices_2, _ = self.matcher.match(tracked_descs_array[None],
+                                                     descriptions,
+                                                     threshold=self.comp_thres,
+                                                     )
 
         # Update matches
-        self.update_matches(keypoints[0], descriptions[0], indices_1, indices_2)
+        self.update_matches(keypoints, descriptions[0], indices_1, indices_2)
 
         # Increment missing keypoints
         self.increment_missing_kps(indices_1)
 
         # Register new keypoints if tracked keypoints are below threshold
         if len(self.tracked_kps) < self.min_points:
-            self.register_non_visited(keypoints[0], descriptions[0], indices_2)
+            self.register_non_visited(keypoints, descriptions[0], indices_2)
 
         # Update tracks
         self.update_tracks()

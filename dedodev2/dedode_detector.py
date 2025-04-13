@@ -46,20 +46,16 @@ class DeDoDeDetector(nn.Module):
         keypoint_logits = self.forward(input_tensor)["keypoint_logits"]
         B,K,H,W = keypoint_logits.shape
         keypoint_p = keypoint_logits.reshape(B, K*H*W).softmax(dim=-1).reshape(B, K, H*W).sum(dim=1)
-        keypoints, confidence = sample_keypoints(keypoint_p.reshape(B,H,W), 
+        keypoints, confidences = sample_keypoints(keypoint_p.reshape(B,H,W),
                                   use_nms = False, sample_topk = True, num_samples = num_keypoints, 
                                   return_scoremap=True, sharpen = False, upsample = False,
                                   increase_coverage=True, remove_borders = self.remove_borders)
-        return {"keypoints": keypoints, "confidence": confidence}
+
+        keypoints = to_pixel_coords(keypoints, img.shape[0], img.shape[1])
+        return keypoints.squeeze(0), confidences.squeeze(0)
 
     def preprocess(self, img, device=get_best_device()):
         input_img = cv2.resize(img, (self.W, self.H))
         input_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2RGB)
         standard_im = input_img/255.
         return self.normalizer(torch.from_numpy(standard_im).permute(2,0,1)).float().to(device)[None]
-
-    def to_pixel_coords(self, x, H, W):
-        return to_pixel_coords(x, H, W)
-    
-    def to_normalized_coords(self, x, H, W):
-        return to_normalized_coords(x, H, W)

@@ -1,7 +1,7 @@
 [project]
 name = "dedodev2-pytorch-inference"
 version = "0.1.0"
-description = "Add your description here"
+description = "Repository for performing feature matching using the DeDoDev2 model in PyTorch"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
