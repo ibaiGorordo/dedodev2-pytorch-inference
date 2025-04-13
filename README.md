@@ -1,6 +1,7 @@
 # DeDoDe v2 Pytorch Inference
 Repository for performing feature matching using the DeDoDev2 model in PyTorch
 
+![matches](https://github.com/user-attachments/assets/eef82d14-04f9-44a2-96e6-800bcad3f630)
 
 ## Installation
 
@@ -41,11 +42,12 @@ python example_image_pair_matching.py
 python example_webcam_feature_tracking.py
 ```
 
-### Video feature tracking example
+### Video feature tracking example (https://youtu.be/cDHNvORTRjo?si=aMZt5hiCrqWf3lhQ)
 
 ```bash
 python example_video_feature_tracking.py
 ```
+![dedodev2](https://github.com/user-attachments/assets/947dc503-6e66-4b51-a54c-1e5e4f27aa43)
 
 ## License
 The code is taken from the official [DeDoDe repository](https://github.com/Parskatt/DeDoDe) which is distributed under the MIT License.
