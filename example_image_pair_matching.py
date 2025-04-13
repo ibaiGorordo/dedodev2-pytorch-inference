@@ -25,9 +25,9 @@ descriptors_2 = descriptor.describe_keypoints(img2, keypoints_2)
 
 # Match descriptor, increasing threshold -> fewer matches, fewer outliers
 threshold = 0.6
-match_indices_1, match_indices_2, probabilities  = matcher.match(descriptors_1,
-                                                     descriptors_2,
-                                                     threshold = threshold)
+match_indices_1, match_indices_2, probabilities = matcher.match(descriptors_1,
+                                                                descriptors_2,
+                                                                threshold = threshold)
 
 # Filter out matches with low probability
 matched_keypoints_1 = keypoints_1[match_indices_1]
