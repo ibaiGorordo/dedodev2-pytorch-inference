@@ -1,0 +1,40 @@
+[project]
+name = "dedodev2-pytorch-inference"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "cmap",
+    "torch>=2.5.1",
+    "torchvision>=0.20.1",
+    "opencv-python",
+    "imread-from-url",
+    "cap-from-youtube",
+]
+
+# Optional dependencies
+[project.optional-dependencies]
+dev = [
+    "cv_videowriter",
+]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu121", marker = "sys_platform != 'darwin'" },
+]
+torchvision = [
+    { index = "pytorch-cu121", marker = "sys_platform != 'darwin'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true
+
+# Using setuptools as the build backend
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
