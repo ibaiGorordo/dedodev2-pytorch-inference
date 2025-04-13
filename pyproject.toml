@@ -38,5 +38,5 @@ explicit = true
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.hatch.metadata]
-allow-direct-references = true
+[tool.setuptools]
+packages = ["dedodev2"]
